@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-configmap
+data:
+  releaseName:  {{ .Release.Name }}
+  myvalue: "Hello World"
+  releaseNamespace:  {{ .Release.Namespace }}
+  releaseIsUpgrade:  {{ .Release.IsUpgrade }}
+  releaseIsInstall:  {{ .Release.IsInstall }}
+  releaseRevision:  {{ .Release.Revision }}
+  releaseService:  {{ .Release.Service }}
+  chartName-chartVersion: {{ .Chart.Name }}-{{ .Chart.Version }}
+  apiVersions.txt: |
+    {{ .Capabilities.APIVersions }}
+  capabilities.KubeVersion:  {{ .Capabilities.KubeVersion }}
+  capabilities.KubeVersion.Major:  {{ .Capabilities.KubeVersion.Major }}
+  capabilities.KubeVersion.Minor:  {{ .Capabilities.KubeVersion.Minor }}
+  capabilities.HelmVersion: |
+    {{ .Capabilities.HelmVersion }}
+#  capabilities.HelmVersion.Version:  {{ .Capabilities.HelmVersion.Version }}
+#  capabilities.HelmVersion.GitCommit:  {{ .Capabilities.HelmVersion.GitCommit }}
+#  capabilities.HelmVersion.GitTreeState:  {{ .Capabilities.HelmVersion.GitTreeState }}
+#  capabilities.HelmVersion.GoVersion:  {{ .Capabilities.HelmVersion.GoVersion }}
+#
+#
+  Template.Name:  {{ .Template.Name }}
+  Template.BasePath:  {{ .Template.BasePath }}
+  drink: {{ .Values.favoriteDrink }}
