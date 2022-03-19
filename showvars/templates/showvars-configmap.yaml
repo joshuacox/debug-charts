@@ -2,7 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-configmap
+  {{- template "showvars.testLabels" . }}
 data:
+  fullname: {{ .Release.Name }}-configmap
   releaseName:  {{ .Release.Name }}
   myvalue: "Hello World"
   releaseNamespace:  {{ .Release.Namespace }}
@@ -26,4 +28,71 @@ data:
 #
   Template.Name:  {{ .Template.Name }}
   Template.BasePath:  {{ .Template.BasePath }}
-  drink: {{ .Values.favoriteDrink }}
+  drink1: {{ .Values.favoriteDrink }}
+  drink: {{ .Values.favorite.drink }}
+  food: {{ .Values.favorite.food }}
+  quoteddrink: {{ .Values.favorite.drink | quote }}
+  quotedfood: {{ quote .Values.favorite.food }}
+  upperquotedfood: {{ .Values.favorite.food | upper | quote }}
+  repeatupperquotedfood: {{ .Values.favorite.food | upper | repeat 5 | quote }}
+  drinknull: {{ .Values.favorite.drinknull  | default "tea" | quote }}
+  computeddrink: {{ .Values.favorite.drink | default (printf "%s-tea" "hostname") }}
+  defaultnamespace: {{ (lookup "v1" "Namespace" "" "default") }}
+    #defaultservices:  {{ range $index, $service := (lookup "v1" "Service" "default" "").items }}{{ $service | quote }}{{ end }}
+  doggy: {{ print "Matt has " .Values.Dogs " dogs" }}
+  doggyf: {{ printf "%s has %e dogs" .Values.DogOwner .Values.Dogs }}
+  doggyln: {{ println "Matt has " .Values.Dogs " dogs" }}
+  trimmed: {{ trim "   hello    " }}
+  trimmalled: {{ trimAll  "$" "   $5.00    " }}
+  trimPrefix: {{ trimPrefix "-" "-hello" }}
+  trimSuffix: {{ trimSuffix "-" "hello-" }}
+  titled: {{ title "hello world" }}
+  randnum9: {{ randNumeric 9 }}
+  randAlpha9: {{ randAlpha 9 }}
+  randAlphaNum33: {{ randAlphaNum 33 }}
+  randAscii33: {{ randAscii 33 | quote }}
+  snakecase: {{ snakecase "FirstName" }}
+  kebabcase: {{ kebabcase "FirstName" }}
+  camelcase: {{ camelcase "http_server" }}
+  swapcase: {{ swapcase "This Is A.Test" }}
+  {{ if eq .Values.favorite.drink "coffee" }}mug: "true"{{ end }}
+  {{- if eq .Values.favorite.drink "coffee" }}
+  mugdiffspace: "true"
+  {{- end }}
+  now: {{ now | date "2006-01-02" }}
+  htmldate: {{ now | htmlDate }}
+  {{- with .Values.favorite }}
+  drinkrestricted: {{ .drink | default "tea" | quote }}
+  foodrestricted: {{ .food | upper | quote }}
+  releaserestricted: {{ $.Release.Name }}
+  toppings: |-
+    {{- range $.Values.pizzaToppings }}
+    - {{ . | title | quote }}
+    {{- end }}    
+  {{- end }}
+  toppings: |-
+    {{- range .Values.pizzaToppings }}
+    - {{ . | title | quote }}
+    {{- end }}    
+  sizes: |-
+    {{- range tuple "small" "medium" "large" }}
+    - {{ . }}
+    {{- end }}   
+  {{- $relname := .Release.Name -}}
+  {{- with .Values.favorite }}
+  relnamerelease: {{ $relname }}
+  {{- end }}
+  toppingsrange: |-
+    {{- range $index, $topping := .Values.pizzaToppings }}
+      {{ $index }}: {{ $topping }}
+    {{- end }} 
+  {{- range $key, $val := .Values.favorite2 }}
+  {{ $key }}: {{ $val | quote }}
+  {{- end }}
+{{ include "showvars.app" . | indent 2 }}
+  {{- $files := .Files }}
+  {{- range tuple "config1.toml" "config2.toml" "config3.toml" }}
+  {{ . }}: |-
+        {{ $files.Get . }}
+  {{- end }}
+  salad: {{ .Values.global.salad }}
